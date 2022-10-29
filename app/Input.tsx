@@ -54,7 +54,7 @@ const Input = (props: Props) => {
         placeholder="Enter a URL"
         onChange={e => setUrl(e.target.value)}
         onKeyUp={e => {
-          if (e.key === "Enter" && url !== "") {
+          if (e.key === "Enter" && url !== "" && urlRegex.test(url)) {
             shorten();
           }
         }}
