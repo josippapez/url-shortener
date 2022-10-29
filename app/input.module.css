@@ -1,0 +1,83 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a;
+  position: relative;
+  height: fit-content;
+}
+
+.input {
+  width: 100%;
+  height: 3.25rem;
+  border-radius: 10px;
+  background-color: #323232;
+  color: white;
+  font-size: 1.5rem;
+  border: 3px solid transparent;
+  position: relative;
+}
+
+.input:focus {
+  border: 3px solid #888888;
+}
+
+.result {
+  position: absolute;
+  top: 4rem;
+  padding: 20px;
+  width: 100%;
+  border-radius: 10px;
+  background-color: #323232;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.copy {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-radius: 0 10px 10px 0;
+  background-color: transparent;
+  cursor: pointer;
+  background-image: url("../styles/assets/images/copy.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.5rem;
+  height: 100%;
+  width: 3rem;
+  border: 3px solid transparent;
+}
+
+.copy:hover {
+  border: 3px solid #888888;
+  background-color: #000000;
+}
+
+.popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius:10px;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  opacity: 0.80;
+  z-index: 1;
+  transition: all 0.5s ease;
+}
+
+.popup.show {
+  opacity: 0;
+  z-index: -1;
+}
+
+.popupText {
+  font-size: 1.5rem;
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
