@@ -14,11 +14,13 @@ const shortenUrl = async (url: string) => {
   return response.data;
 };
 
+const urlRegex =
+  /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 const Input = (props: Props) => {
   const { style } = props;
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [displayPopup, setDisplayPopup] = useState(false);
-  const url = useRef("");
+  const [url, setUrl] = useState("");
   let timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const Input = (props: Props) => {
   }, [displayPopup]);
 
   const shorten = useCallback(() => {
-    shortenUrl(url.current).then(data => {
+    shortenUrl(url).then(data => {
       setShortenedUrl(data);
     });
   }, []);
@@ -44,12 +46,15 @@ const Input = (props: Props) => {
   return (
     <div className={`width-full ${style.wrapper}`}>
       <input
-        className={style.input}
+        className={`${style.input} ${
+          url !== "" && !urlRegex.test(url) && style.invalid
+        }`}
+        value={url}
         type="text"
         placeholder="Enter a URL"
-        onChange={e => (url.current = e.target.value)}
+        onChange={e => setUrl(e.target.value)}
         onKeyUp={e => {
-          if (e.key === "Enter" && url.current && url.current !== "") {
+          if (e.key === "Enter" && url !== "") {
             shorten();
           }
         }}
@@ -59,15 +64,12 @@ const Input = (props: Props) => {
           {shortenedUrl}
         </a>
         <button
-          className={style.copy}
+          className={`${style.copy} ${displayPopup ? style.show : ""}`}
           onClick={() => {
             setDisplayPopup(true);
             navigator.clipboard.writeText(shortenedUrl);
           }}
         />
-        <div className={`${style.popup} ${!displayPopup && style.show}`}>
-          <div className={style.popupText}>Copied to clipboard</div>
-        </div>
       </div>
     </div>
   );
