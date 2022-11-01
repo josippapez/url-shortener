@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
@@ -18,7 +19,10 @@ const urlRegex =
   /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 const Input = (props: Props) => {
   const { style } = props;
-  const [shortenedUrl, setShortenedUrl] = useState("");
+  const [shortenedUrlResponse, setShortenedUrlResponse] = useState({
+    shortenedUrl: "",
+    base64QRCode: "",
+  });
   const [displayPopup, setDisplayPopup] = useState(false);
   const [url, setUrl] = useState("");
   let timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,10 +41,15 @@ const Input = (props: Props) => {
     };
   }, [displayPopup]);
 
-  const shorten = useCallback(() => {
-    shortenUrl(url).then(data => {
-      setShortenedUrl(data);
-    });
+  const handleShorten = useCallback(async () => {
+    if (urlRegex.test(url)) {
+      const shortenedUrl = await shortenUrl(url);
+      setShortenedUrlResponse(shortenedUrl);
+    }
+  }, [url]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
   }, []);
 
   return (
@@ -52,23 +61,41 @@ const Input = (props: Props) => {
         value={url}
         type="text"
         placeholder="Enter a URL"
-        onChange={e => setUrl(e.target.value)}
+        onChange={e => {
+          handleChange(e);
+        }}
         onKeyUp={e => {
           if (e.key === "Enter" && url !== "" && urlRegex.test(url)) {
-            shorten();
+            handleShorten();
           }
         }}
       />
-      <div hidden={shortenedUrl === ""} className={style.result}>
-        <a href={shortenedUrl} target="_blank" rel="noreferrer">
-          {shortenedUrl}
-        </a>
-        <button
-          className={`${style.copy} ${displayPopup ? style.show : ""}`}
-          onClick={() => {
-            setDisplayPopup(true);
-            navigator.clipboard.writeText(shortenedUrl);
-          }}
+      <div
+        hidden={shortenedUrlResponse.shortenedUrl === ""}
+        className={style.result}
+      >
+        <div className={style.shortenedUrl}>
+          <a
+            href={shortenedUrlResponse.shortenedUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {shortenedUrlResponse.shortenedUrl}
+          </a>
+          <button
+            className={`${style.copy} ${displayPopup ? style.show : ""}`}
+            onClick={() => {
+              setDisplayPopup(true);
+              navigator.clipboard.writeText(shortenedUrlResponse.shortenedUrl);
+            }}
+          />
+        </div>
+        <Image
+          className={style.qrCode}
+          src={`data:image/png;base64,${shortenedUrlResponse.base64QRCode}`}
+          alt="QR Code"
+          width={200}
+          height={200}
         />
       </div>
     </div>
